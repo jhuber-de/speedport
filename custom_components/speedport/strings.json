@@ -7,6 +7,13 @@
           "username": "[%key:common::config_flow::data::username%]",
           "password": "[%key:common::config_flow::data::password%]"
         }
+      },
+      "hybrid": {
+        "title": "Hybrid sensors",
+        "description": "Only relevant for hybrid routers with a 4G/5G backup connection. Pre-selected based on your router's current status.",
+        "data": {
+          "show_hybrid_sensors": "Show hybrid sensors"
+        }
       }
     },
     "error": {
@@ -16,6 +23,18 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Settings",
+        "description": "Time to stop updating sensors that require authorization when the user logs in to the web interface. (User gets logged out after this time)",
+        "data": {
+          "pause_time": "Pause for minutes",
+          "show_hybrid_sensors": "Show hybrid sensors"
+        }
+      }
     }
   }
 }

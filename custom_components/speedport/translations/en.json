@@ -15,6 +15,13 @@
                     "password": "Password",
                     "https": "Use https connection"
                 }
+            },
+            "hybrid": {
+                "title": "Hybrid sensors",
+                "description": "Only relevant for hybrid routers with a 4G/5G backup connection. Pre-selected based on your router's current status.",
+                "data": {
+                    "show_hybrid_sensors": "Show hybrid sensors"
+                }
             }
         }
     },
@@ -22,7 +29,8 @@
         "step": {
             "init": {
                 "data": {
-                    "pause_time": "Pause for minutes"
+                    "pause_time": "Pause for minutes",
+                    "show_hybrid_sensors": "Show hybrid sensors"
                 },
                 "title": "Settings",
                 "description": "Time to stop updating sensors that require authorization when the user logs in to the web interface. (User gets logged out after this time)"

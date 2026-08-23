@@ -15,6 +15,13 @@
                     "password": "Passwort",
                     "https": "Nutze https Verbindung"
                 }
+            },
+            "hybrid": {
+                "title": "Hybrid-Sensoren",
+                "description": "Nur relevant für Hybrid-Router mit 4G-/5G-Backup-Verbindung. Basierend auf dem aktuellen Router-Status vorausgewählt.",
+                "data": {
+                    "show_hybrid_sensors": "Hybrid-Sensoren anzeigen"
+                }
             }
         }
     },
@@ -22,7 +29,8 @@
         "step": {
             "init": {
                 "data": {
-                    "pause_time": "Pause in Minuten"
+                    "pause_time": "Pause in Minuten",
+                    "show_hybrid_sensors": "Hybrid-Sensoren anzeigen"
                 },
                 "title": "Einstellungen",
                 "description": "Zeit in der das Updaten der Sensoren pausiert wird wenn sich ein Nutzer im Speedport Web-UI einloggt (Nutzer wird nach dieser Zeit ausgeloggt)"
