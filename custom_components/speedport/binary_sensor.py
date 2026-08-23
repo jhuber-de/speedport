@@ -19,8 +19,8 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class SpeedportBinarySensorEntityDescription(BinarySensorEntityDescription):
-    condition_key: str = ""
     value: str = ""
+    hybrid_only: bool = False
 
 
 BINARY_SENSORS: tuple[SpeedportBinarySensorEntityDescription, ...] = (
@@ -45,22 +45,22 @@ BINARY_SENSORS: tuple[SpeedportBinarySensorEntityDescription, ...] = (
         key="dsl_tunnel",
         name="DSL Tunnel",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
-        condition_key="use_lte",
         value="1",
+        hybrid_only=True,
     ),
     SpeedportBinarySensorEntityDescription(
         key="lte_tunnel",
         name="LTE Tunnel",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
-        condition_key="use_lte",
         value="1",
+        hybrid_only=True,
     ),
     SpeedportBinarySensorEntityDescription(
         key="hybrid_tunnel",
         name="Hybrid Tunnel",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
-        condition_key="use_lte",
         value="1",
+        hybrid_only=True,
     ),
 )
 
@@ -70,12 +70,12 @@ async def async_setup_entry(
 ) -> None:
     """Set up entry."""
     speedport: Speedport = hass.data[DOMAIN][entry.entry_id]
+    show_hybrid_sensors = entry.options.get("show_hybrid_sensors", True)
 
     entities = [
         SpeedportBinarySensor(hass, speedport, description)
         for description in BINARY_SENSORS
-        if not description.condition_key
-        or speedport.get(description.condition_key) == "1"
+        if not description.hybrid_only or show_hybrid_sensors
     ]
 
     async_add_entities(entities)
@@ -92,7 +92,9 @@ class SpeedportBinarySensor(SpeedportEntity, BinarySensorEntity):
             == self.entity_description.value
         )
 
+    @property
     def available(self) -> bool:
-        if self._speedport.get(self.entity_description.key) is None:
-            return False
-        return super().available
+        return (
+            super().available
+            and self._speedport.get(self.entity_description.key) is not None
+        )
