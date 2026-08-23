@@ -42,10 +42,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def update_listener(hass, entry):
-    """Handle options update."""
-    speedport: Speedport = hass.data[DOMAIN][entry.entry_id]
-    speedport.set_pause_time(entry.options.get("pause_time", 5))
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload the entry so updated options take effect."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
