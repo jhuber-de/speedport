@@ -36,19 +36,24 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     if not await speedport.login(data["password"]):
         raise InvalidAuth
 
-    # If you cannot connect:
-    # throw CannotConnect
-    # If the authentication is wrong:
-    # InvalidAuth
+    await speedport.update_status()
 
-    # Return info that you want to store in the config entry.
-    return {"title": "Speedport"}
+    return {
+        "title": "Speedport",
+        "hybrid_detected": speedport.get("use_lte") == "1",
+    }
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Speedport."""
 
     VERSION = 1
+
+    def __init__(self) -> None:
+        """Initialize the config flow."""
+        self._user_input: dict[str, Any] = {}
+        self._title: str = ""
+        self._hybrid_detected: bool = True
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -71,10 +76,35 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
-            return self.async_create_entry(title=info["title"], data=user_input)
+            self._user_input = user_input
+            self._title = info["title"]
+            self._hybrid_detected = info["hybrid_detected"]
+            return await self.async_step_hybrid()
 
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+        )
+
+    async def async_step_hybrid(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Ask whether hybrid (4G/5G) sensors should be created."""
+        if user_input is not None:
+            return self.async_create_entry(
+                title=self._title,
+                data=self._user_input,
+                options={"show_hybrid_sensors": user_input["show_hybrid_sensors"]},
+            )
+
+        return self.async_show_form(
+            step_id="hybrid",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        "show_hybrid_sensors", default=self._hybrid_detected
+                    ): bool
+                }
+            ),
         )
 
     @staticmethod
@@ -113,7 +143,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Required(
                         "pause_time",
                         default=self.config_entry.options.get("pause_time", 5),
-                    ): int
+                    ): int,
+                    vol.Required(
+                        "show_hybrid_sensors",
+                        default=self.config_entry.options.get(
+                            "show_hybrid_sensors", True
+                        ),
+                    ): bool,
                 }
             ),
         )
