@@ -14,6 +14,7 @@ from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from speedport import Speedport
@@ -118,6 +119,16 @@ async def async_setup_entry(
     """Set up entry."""
     speedport: Speedport = hass.data[DOMAIN][entry.entry_id]
     show_hybrid_sensors = entry.options.get("show_hybrid_sensors", True)
+
+    if not show_hybrid_sensors:
+        registry = er.async_get(hass)
+        for description in SENSORS:
+            if description.hybrid_only:
+                unique_id = f"speedport_{description.key}"
+                if entity_id := registry.async_get_entity_id(
+                    "sensor", DOMAIN, unique_id
+                ):
+                    registry.async_remove(entity_id)
 
     entities = [
         SpeedportBinarySensor(hass, speedport, description)

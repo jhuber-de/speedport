@@ -8,7 +8,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 from speedport import Speedport
 
-from .config_flow import OptionsFlowHandler
 from .const import DOMAIN
 
 PLATFORMS: list[Platform] = [
@@ -32,8 +31,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         pause_time=entry.options.get("pause_time", 5),
     ).create()
     hass.data[DOMAIN][entry.entry_id] = speedport
-    hass.data[DOMAIN]["coordinators"] = {}
+    hass.data[DOMAIN].setdefault("coordinators", {})
     await asyncio.gather(*[speedport.update_status(), speedport.update_ip_data()])
+
+    if "show_hybrid_sensors" not in entry.options:
+        hass.config_entries.async_update_entry(
+            entry,
+            options={
+                **entry.options,
+                "show_hybrid_sensors": speedport.get("use_lte") == "1",
+            },
+        )
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
@@ -51,6 +59,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         speedport = hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN].get("coordinators", {}).pop(speedport.serial_number, None)
         await speedport.close()
 
     return unload_ok

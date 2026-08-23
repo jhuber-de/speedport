@@ -33,7 +33,7 @@
                     "show_hybrid_sensors": "Hybrid-Sensoren anzeigen"
                 },
                 "title": "Einstellungen",
-                "description": "Zeit in der das Updaten der Sensoren pausiert wird wenn sich ein Nutzer im Speedport Web-UI einloggt (Nutzer wird nach dieser Zeit ausgeloggt)"
+                "description": "Zeit in der das Updaten der Sensoren pausiert wird wenn sich ein Nutzer im Speedport Web-UI einloggt (Nutzer wird nach dieser Zeit ausgeloggt). Hybrid-Sensoren decken 4G-/5G-Tunnel-Status und Signalstärke ab – nur relevant für Hybrid-Router mit Mobilfunk-Backup."
             }
         }
     }

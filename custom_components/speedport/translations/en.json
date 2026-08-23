@@ -33,7 +33,7 @@
                     "show_hybrid_sensors": "Show hybrid sensors"
                 },
                 "title": "Settings",
-                "description": "Time to stop updating sensors that require authorization when the user logs in to the web interface. (User gets logged out after this time)"
+                "description": "Time to stop updating sensors that require authorization when the user logs in to the web interface. (User gets logged out after this time). Hybrid sensors cover 4G/5G tunnel status and signal strength — only relevant for hybrid routers with a cellular backup connection."
             }
         }
     }
